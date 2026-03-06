@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/lwhfxmoss/fxonebot-openclaw/blob/main/docs/README.md
+    about: Read the installation and development docs first.
