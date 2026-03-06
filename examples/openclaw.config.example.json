@@ -1,0 +1,46 @@
+{
+  "plugins": {
+    "entries": {
+      "onebot": {
+        "enabled": true
+      }
+    },
+    "allow": [
+      "onebot"
+    ]
+  },
+  "channels": {
+    "onebot": {
+      "enabled": true,
+      "accounts": {
+        "default": {
+          "enabled": true,
+          "name": "NapCat",
+          "wsReverse": {
+            "host": "0.0.0.0",
+            "port": 6198,
+            "path": "/",
+            "token": "<ONEBOT_WS_TOKEN>"
+          },
+          "dmPolicy": "pairing",
+          "allowFrom": [],
+          "ownerAllowFrom": [
+            "<OWNER_QQ>"
+          ],
+          "groupPolicy": "allowlist",
+          "groupAllowFrom": [],
+          "groups": {
+            "<GROUP_ID>": {
+              "allowFrom": [
+                "<OWNER_QQ>"
+              ]
+            },
+            "*": {
+              "requireMention": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

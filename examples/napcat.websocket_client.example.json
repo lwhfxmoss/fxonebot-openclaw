@@ -1,0 +1,11 @@
+{
+  "enable": true,
+  "debug": true,
+  "name": "openclaw-onebot",
+  "url": "ws://<OPENCLAW_HOST>:<OPENCLAW_ONEBOT_PORT>",
+  "reportSelfMessage": true,
+  "messagePostFormat": "array",
+  "token": "<ONEBOT_WS_TOKEN>",
+  "heartInterval": 30000,
+  "reconnectInterval": 5000
+}

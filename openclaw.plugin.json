@@ -1,0 +1,9 @@
+{
+  "id": "onebot",
+  "channels": ["onebot"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
