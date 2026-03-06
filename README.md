@@ -33,8 +33,19 @@
 - 文档导航：`docs/README.md`
 - 安装说明：`docs/INSTALLATION.md`
 - 开发说明：`docs/DEVELOPMENT.md`
+- 架构说明：`docs/ARCHITECTURE.md`
 - OpenClaw 示例配置：`examples/openclaw.config.example.json`
 - NapCat 示例配置：`examples/napcat.websocket_client.example.json`
+
+## 架构简图
+
+```mermaid
+flowchart LR
+    A[NapCat / OneBot v11 client] -->|reverse WebSocket| B[fxonebot-openclaw plugin]
+    B -->|channel registration + runtime hooks| C[OpenClaw host runtime]
+    C -->|reply dispatch| B
+    B -->|send_private_msg / send_group_msg| A
+```
 
 ## 典型使用方式
 
@@ -106,6 +117,7 @@ It is **not** a full OpenClaw monorepo and does not contain private runtime conf
 - Docs index: `docs/README.md`
 - Installation guide: `docs/INSTALLATION.md`
 - Development guide: `docs/DEVELOPMENT.md`
+- Architecture guide: `docs/ARCHITECTURE.md`
 - OpenClaw example config: `examples/openclaw.config.example.json`
 - NapCat example config: `examples/napcat.websocket_client.example.json`
 
