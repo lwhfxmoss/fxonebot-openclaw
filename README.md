@@ -87,7 +87,7 @@ flowchart LR
 - `package.json`：插件包信息
 - `src/`：插件源码与 focused tests
 - `docs/`：安装与开发文档
-- `examples/`：公开安全的占位示例配置
+- `examples/`：占位示例配置
 - `scripts/`：上游校验辅助脚本
 - `.github/workflows/ci.yml`：CI 工作流
 
@@ -100,14 +100,6 @@ flowchart LR
 - 运行 upstream build
 
 这样可以保证仓库对当前实际可安装宿主版本保持可用，而不是只对源码主干成立。
-
-## 公共仓库原则
-
-为了适合公开发布，本仓库遵循：
-
-- 示例配置全部使用占位符
-- 不提交真实 token、内网 IP、QQ 号、owner 标识
-- 文档使用通用化描述，不绑定私人运行环境
 
 ---
 

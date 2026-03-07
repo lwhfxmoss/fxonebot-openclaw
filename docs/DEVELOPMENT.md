@@ -55,9 +55,9 @@ Focused tests live in:
 - `src/ws-server.test.ts`
 - `src/inbound-internal.test.ts`
 
-## Public repository policy
+## Repository hygiene
 
-This repository is intended to stay public-safe:
+Keep the repository reusable and easy to publish:
 
 - use placeholders in examples and docs
 - do not commit real tokens, IPs, account ids, or owner identifiers
