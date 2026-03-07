@@ -3,7 +3,9 @@ import {
   createNormalizedOutboundDeliverer,
   createReplyPrefixOptions,
   createScopedPairingAccess,
+  createTypingCallbacks,
   formatTextWithAttachmentLinks,
+  logTypingFailure,
   readStoreAllowFromForDmPolicy,
   resolveDmGroupAccessWithCommandGate,
   resolveMentionGatingWithBypass,
@@ -14,13 +16,15 @@ import {
   type OpenClawConfig,
   type OutboundReplyPayload,
   type RuntimeEnv,
-} from "openclaw/plugin-sdk/compat";
+} from "openclaw/plugin-sdk";
 import { getOneBotRuntime } from "./runtime.js";
 import type { OneBotGroupRule, ResolvedOneBotAccount } from "./types.js";
 import { sendOneBotAction } from "./ws-server.js";
 
 const CHANNEL_ID = "onebot" as const;
 const MESSAGE_DEDUPE_TTL_MS = 120_000;
+const ONEBOT_TYPING_KEEPALIVE_INTERVAL_MS = 3_000;
+const ONEBOT_TYPING_MAX_DURATION_MS = 60_000;
 const seenMessageIds = new Map<string, number>();
 
 type OneBotMessageSegment = {
@@ -58,6 +62,8 @@ type GroupBindingCommand =
       action: "reset";
       groupId: string;
     };
+
+type TypingCallbacks = ReturnType<typeof createTypingCallbacks>;
 
 function toId(value: string | number | undefined): string {
   if (value === undefined || value === null) return "";
@@ -317,6 +323,60 @@ function resolveOwnerAllowFrom(account: ResolvedOneBotAccount): string[] {
     return account.config.ownerAllowFrom;
   }
   return account.config.allowFrom;
+}
+
+function shouldEnableTyping(params: {
+  account: ResolvedOneBotAccount;
+  isGroup: boolean;
+  senderId: string;
+}): boolean {
+  if (params.isGroup) {
+    return false;
+  }
+  if (!params.senderId.trim()) {
+    return false;
+  }
+  return params.account.config.typingIndicator ?? true;
+}
+
+function createOneBotTypingCallbacks(params: {
+  account: ResolvedOneBotAccount;
+  isGroup: boolean;
+  senderId: string;
+  runtime: RuntimeEnv;
+  startTyping?: () => Promise<void>;
+}): TypingCallbacks | undefined {
+  if (!shouldEnableTyping(params)) {
+    return undefined;
+  }
+
+  const startTyping =
+    params.startTyping ??
+    (async () => {
+      await sendOneBotAction({
+        accountId: params.account.accountId,
+        action: "set_input_status",
+        payload: {
+          user_id: params.senderId,
+          event_type: 1,
+        },
+        timeoutMs: 3_000,
+      });
+    });
+
+  return createTypingCallbacks({
+    start: startTyping,
+    onStartError: (err) =>
+      logTypingFailure({
+        log: (message) => params.runtime.error?.(message),
+        channel: CHANNEL_ID,
+        action: "start",
+        error: err,
+      }),
+    keepaliveIntervalMs: ONEBOT_TYPING_KEEPALIVE_INTERVAL_MS,
+    maxConsecutiveFailures: 2,
+    maxDurationMs: ONEBOT_TYPING_MAX_DURATION_MS,
+  });
 }
 
 async function sendPrivateText(params: {
@@ -701,12 +761,20 @@ export async function handleOneBotInbound(params: {
     });
   });
 
+  const typingCallbacks = createOneBotTypingCallbacks({
+    account,
+    isGroup,
+    senderId,
+    runtime,
+  });
+
   await core.channel.reply.dispatchReplyWithBufferedBlockDispatcher({
     ctx: ctxPayload,
     cfg: config,
     dispatcherOptions: {
       ...prefixOptions,
       deliver: deliverReply,
+      typingCallbacks,
       onError: (err, info) => {
         runtime.error?.(`onebot ${info.kind} reply failed: ${String(err)}`);
       },
@@ -728,4 +796,6 @@ export const onebotInboundInternal = {
   resetGroupBinding,
   listGroupBindings,
   resolveOwnerAllowFrom,
+  shouldEnableTyping,
+  createOneBotTypingCallbacks,
 };

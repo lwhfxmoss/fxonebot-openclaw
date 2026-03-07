@@ -4,38 +4,48 @@
 
 This repository is maintained as a **plugin-only repository**.
 
-The plugin is validated against upstream OpenClaw rather than pretending to be a full OpenClaw workspace.
+It is intended to stay compatible with the currently usable public OpenClaw release line for this plugin target.
+
+## Current compatibility strategy
+
+Current public target:
+
+- OpenClaw `2026.3.2` npm/global install path
+
+This is why the plugin currently imports from:
+
+- `openclaw/plugin-sdk`
+
+instead of using source-tree-only subpaths that may not be exported in the released npm package.
 
 ## Local validation
 
-Run upstream strong validation locally:
+Run upstream compatibility validation locally:
 
 ```bash
 bash scripts/ci_validate_upstream.sh
 ```
 
-What it does:
+## Validation flow
+
+The script currently does this:
 
 1. clones upstream OpenClaw
 2. installs upstream dependencies
 3. patches upstream for OneBot plugin SDK routing
 4. overlays this plugin into `extensions/onebot/`
 5. runs focused tests
-6. runs upstream build and checks
+6. runs upstream build
 
-## Why CI matters
-
-Because the plugin depends on upstream OpenClaw interfaces, CI is the compatibility gate.
-
-If upstream changes plugin SDK import rules, build constraints, or lint rules, this repository should fail early in CI rather than later in deployment.
+This keeps the repository practical for real released-host compatibility.
 
 ## Source files
 
 - `index.ts` - plugin registration entry
-- `src/channel.ts` - channel plugin wiring
-- `src/inbound.ts` - inbound handling and gate logic
+- `src/channel.ts` - channel wiring and outbound behavior
+- `src/inbound.ts` - inbound parsing, gate checks, owner commands, QQ DM typing
 - `src/ws-server.ts` - reverse WebSocket server
-- `src/accounts.ts` - account resolution
+- `src/accounts.ts` - account config resolution
 - `src/config-schema.ts` - OneBot config schema
 
 ## Tests

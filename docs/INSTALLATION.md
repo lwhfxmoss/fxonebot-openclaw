@@ -1,5 +1,9 @@
 # Installation
 
+## Target environment
+
+This repository is currently organized for **OpenClaw `2026.3.2` released via npm/global installs**.
+
 ## Prerequisites
 
 - A working OpenClaw instance
@@ -8,7 +12,7 @@
 
 ## 1. Place the plugin in OpenClaw
 
-Copy this repository into the upstream OpenClaw workspace as:
+Copy this repository into the OpenClaw workspace as:
 
 - `extensions/onebot/`
 
@@ -50,11 +54,12 @@ After configuration:
 3. Verify NapCat connects to OpenClaw
 4. Test private chat flow
 5. Test group allowlist + `@bot` flow
+6. Test QQ DM typing indicator
 
-## Recommended validation order
+## QQ DM typing note
 
-1. Private chat pairing / allowlist
-2. Private chat reply
-3. Owner grant command
-4. Group `@bot` reply from authorized sender
-5. Group no-reply for unauthorized or non-mentioned messages
+`v0.2.0` adds QQ private-chat typing support only.
+
+- private chat: supported
+- group chat typing: not enabled in this version
+- typing failure: should not block reply delivery

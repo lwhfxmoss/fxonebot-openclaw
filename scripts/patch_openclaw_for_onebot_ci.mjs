@@ -19,6 +19,20 @@ function patchPackageJson(upstreamRoot) {
     throw new Error("package.json missing exports object");
   }
 
+  if (!pkg.exports["./plugin-sdk/compat"]) {
+    pkg.exports["./plugin-sdk/compat"] = {
+      types: "./dist/plugin-sdk/compat.d.ts",
+      default: "./dist/plugin-sdk/compat.js",
+    };
+  }
+
+  if (!pkg.exports["./plugin-sdk/core"]) {
+    pkg.exports["./plugin-sdk/core"] = {
+      types: "./dist/plugin-sdk/core.d.ts",
+      default: "./dist/plugin-sdk/core.js",
+    };
+  }
+
   pkg.exports["./plugin-sdk/onebot"] = {
     types: "./dist/plugin-sdk/onebot.d.ts",
     default: "./dist/plugin-sdk/onebot.js",
@@ -35,20 +49,37 @@ function patchVitestConfig(upstreamRoot) {
     return;
   }
 
-  const anchor = '  "nextcloud-talk",\n';
-  if (!raw.includes(anchor)) {
-    throw new Error("vitest.config.ts anchor not found for pluginSdkSubpaths");
+  const newLayoutAnchor = '  "nextcloud-talk",\n';
+  if (raw.includes(newLayoutAnchor)) {
+    const patched = raw.replace(newLayoutAnchor, `${newLayoutAnchor}  "onebot",\n`);
+    writeUtf8(vitestConfigPath, patched);
+    return;
   }
 
-  const patched = raw.replace(anchor, `${anchor}  "onebot",\n`);
-  writeUtf8(vitestConfigPath, patched);
+  const legacyAliasAnchor = `      {\n        find: "openclaw/plugin-sdk",\n        replacement: path.join(repoRoot, "src", "plugin-sdk", "index.ts"),\n      },\n`;
+  if (raw.includes(legacyAliasAnchor)) {
+    const insertion = `      {\n        find: "openclaw/plugin-sdk/compat",\n        replacement: path.join(repoRoot, "src", "plugin-sdk", "compat.ts"),\n      },\n      {\n        find: "openclaw/plugin-sdk/core",\n        replacement: path.join(repoRoot, "src", "plugin-sdk", "core.ts"),\n      },\n      {\n        find: "openclaw/plugin-sdk/onebot",\n        replacement: path.join(repoRoot, "src", "plugin-sdk", "onebot.ts"),\n      },\n`;
+    const patched = raw.replace(legacyAliasAnchor, `${insertion}${legacyAliasAnchor}`);
+    writeUtf8(vitestConfigPath, patched);
+    return;
+  }
+
+  throw new Error("vitest.config.ts patch anchor not found for onebot plugin-sdk routing");
 }
 
 function ensurePluginSdkEntry(upstreamRoot) {
   const pluginSdkDir = path.join(upstreamRoot, "src", "plugin-sdk");
   fs.mkdirSync(pluginSdkDir, { recursive: true });
   const onebotSdkPath = path.join(pluginSdkDir, "onebot.ts");
+  const compatSdkPath = path.join(pluginSdkDir, "compat.ts");
+  const coreSdkPath = path.join(pluginSdkDir, "core.ts");
   writeUtf8(onebotSdkPath, 'export * from "./index.js";\n');
+  if (!fs.existsSync(compatSdkPath)) {
+    writeUtf8(compatSdkPath, 'export * from "./index.js";\n');
+  }
+  if (!fs.existsSync(coreSdkPath)) {
+    writeUtf8(coreSdkPath, 'export * from "./index.js";\n');
+  }
 }
 
 function main() {

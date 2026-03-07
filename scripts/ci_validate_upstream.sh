@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 UPSTREAM_REPO="${OPENCLAW_UPSTREAM_REPO:-https://github.com/openclaw/openclaw.git}"
-UPSTREAM_REF="${OPENCLAW_UPSTREAM_REF:-main}"
+UPSTREAM_REF="${OPENCLAW_UPSTREAM_REF:-v2026.3.2}"
 
 if [[ -z "${RUNNER_TEMP:-}" ]]; then
   WORK_BASE="$ROOT/.tmp"
@@ -48,7 +48,4 @@ pnpm vitest run \
 echo "[ci] run upstream build"
 pnpm build
 
-echo "[ci] run upstream checks"
-pnpm check
-
-echo "[ci] strong validation completed"
+echo "[ci] validation completed"

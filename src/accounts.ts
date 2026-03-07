@@ -1,5 +1,5 @@
-import type { OpenClawConfig } from "openclaw/plugin-sdk/compat";
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk/compat";
+import type { OpenClawConfig } from "openclaw/plugin-sdk";
+import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "openclaw/plugin-sdk";
 import type { OneBotAccountRaw, OneBotChannelRaw, ResolvedOneBotAccount } from "./types.js";
 
 function getChannel(cfg: OpenClawConfig): OneBotChannelRaw {
@@ -60,6 +60,7 @@ export function resolveOneBotAccount(params: {
   const groupAllowFrom = toStringList(account?.groupAllowFrom ?? channel.groupAllowFrom);
   const groups = account?.groups ?? channel.groups ?? {};
   const wsReverse = resolveWsReverse(channel, account);
+  const typingIndicator = account?.typingIndicator ?? channel.typingIndicator ?? true;
 
   const configured = Boolean(wsReverse.token && wsReverse.path && wsReverse.port);
 
@@ -76,6 +77,7 @@ export function resolveOneBotAccount(params: {
       groupAllowFrom,
       groups,
       defaultTo: account?.defaultTo,
+      typingIndicator,
       wsReverse,
     },
   };

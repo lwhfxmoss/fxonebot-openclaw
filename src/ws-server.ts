@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
-import type { ChannelLogSink } from "openclaw/plugin-sdk/compat";
+import type { ChannelLogSink } from "openclaw/plugin-sdk";
 import { WebSocketServer, WebSocket } from "ws";
 import type { ResolvedOneBotAccount } from "./types.js";
 

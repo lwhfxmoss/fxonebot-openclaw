@@ -1,5 +1,5 @@
-import type { OpenClawPluginApi, ChannelPlugin } from "openclaw/plugin-sdk/compat";
-import { emptyPluginConfigSchema } from "openclaw/plugin-sdk/compat";
+import type { OpenClawPluginApi, ChannelPlugin } from "openclaw/plugin-sdk";
+import { emptyPluginConfigSchema } from "openclaw/plugin-sdk";
 import { onebotPlugin } from "./src/channel.js";
 import { setOneBotRuntime } from "./src/runtime.js";
 

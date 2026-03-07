@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { onebotInboundInternal } from "./inbound.js";
 
 describe("onebot inbound internal helpers", () => {
@@ -107,5 +107,62 @@ describe("onebot inbound internal helpers", () => {
     });
     expect(resetRes.changed).toBe(true);
     expect(resetRes.nextAllowFrom).toEqual([]);
+  });
+
+  it("enables typing only for direct chats with non-empty sender", () => {
+    const account = {
+      config: { typingIndicator: true },
+    } as any;
+
+    expect(
+      onebotInboundInternal.shouldEnableTyping({ account, isGroup: false, senderId: "123" }),
+    ).toBe(true);
+    expect(
+      onebotInboundInternal.shouldEnableTyping({ account, isGroup: true, senderId: "123" }),
+    ).toBe(false);
+    expect(
+      onebotInboundInternal.shouldEnableTyping({ account, isGroup: false, senderId: "" }),
+    ).toBe(false);
+  });
+
+  it("skips typing callbacks when typing indicator is disabled", () => {
+    const runtime = { error: vi.fn() } as any;
+    const account = {
+      accountId: "default",
+      config: { typingIndicator: false },
+    } as any;
+
+    const callbacks = onebotInboundInternal.createOneBotTypingCallbacks({
+      account,
+      isGroup: false,
+      senderId: "123",
+      runtime,
+      startTyping: vi.fn(async () => {}),
+    });
+
+    expect(callbacks).toBeUndefined();
+  });
+
+  it("typing start failure does not reject reply lifecycle", async () => {
+    const runtime = { error: vi.fn() } as any;
+    const startTyping = vi.fn(async () => {
+      throw new Error("typing failed");
+    });
+    const account = {
+      accountId: "default",
+      config: { typingIndicator: true },
+    } as any;
+
+    const callbacks = onebotInboundInternal.createOneBotTypingCallbacks({
+      account,
+      isGroup: false,
+      senderId: "123",
+      runtime,
+      startTyping,
+    });
+
+    await expect(callbacks?.onReplyStart?.()).resolves.toBeUndefined();
+    expect(startTyping).toHaveBeenCalled();
+    expect(runtime.error).toHaveBeenCalled();
   });
 });

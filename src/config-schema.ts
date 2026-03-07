@@ -27,6 +27,7 @@ const OneBotAccountSchema = z
     groupAllowFrom: z.array(z.union([z.string(), z.number()])).optional(),
     groups: z.record(z.string(), OneBotGroupRuleSchema).optional(),
     defaultTo: z.string().optional(),
+    typingIndicator: z.boolean().optional(),
   })
   .passthrough();
 
@@ -41,5 +42,6 @@ export const OneBotConfigSchema = z
     groupPolicy: OneBotAccountSchema.shape.groupPolicy.optional(),
     groupAllowFrom: OneBotAccountSchema.shape.groupAllowFrom.optional(),
     groups: OneBotAccountSchema.shape.groups.optional(),
+    typingIndicator: OneBotAccountSchema.shape.typingIndicator.optional(),
   })
   .passthrough();

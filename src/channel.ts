@@ -8,7 +8,7 @@ import {
   setAccountEnabledInConfigSection,
   type ChannelPlugin,
   type OpenClawConfig,
-} from "openclaw/plugin-sdk/compat";
+} from "openclaw/plugin-sdk";
 import {
   listOneBotAccountIds,
   resolveDefaultOneBotAccountId,

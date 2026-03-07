@@ -40,6 +40,7 @@ function buildAccount(params: {
       groupPolicy: "allowlist",
       groupAllowFrom: [],
       groups: {},
+      typingIndicator: true,
       wsReverse: {
         host: "127.0.0.1",
         port: params.port,

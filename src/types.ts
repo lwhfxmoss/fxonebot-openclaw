@@ -22,6 +22,7 @@ export type OneBotAccountRaw = {
   groupAllowFrom?: Array<string | number>;
   groups?: Record<string, OneBotGroupRule>;
   defaultTo?: string;
+  typingIndicator?: boolean;
 };
 
 export type OneBotChannelRaw = {
@@ -34,6 +35,7 @@ export type OneBotChannelRaw = {
   groupAllowFrom?: OneBotAccountRaw["groupAllowFrom"];
   groups?: OneBotAccountRaw["groups"];
   wsReverse?: OneBotWsReverseConfig;
+  typingIndicator?: OneBotAccountRaw["typingIndicator"];
 };
 
 export type ResolvedOneBotAccount = {
@@ -49,6 +51,7 @@ export type ResolvedOneBotAccount = {
     groupAllowFrom: string[];
     groups: Record<string, OneBotGroupRule>;
     defaultTo?: string;
+    typingIndicator: boolean;
     wsReverse: Required<OneBotWsReverseConfig>;
   };
 };
